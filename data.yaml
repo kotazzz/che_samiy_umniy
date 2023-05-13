@@ -1,0 +1,36 @@
+teams:
+  - Красные
+  - Синие
+
+questions:
+    Языки программирования:
+      - Какой язык использует Unity, как язык для игр?:
+          cost: 100
+          questions:
+            - C#
+            - Python
+            - C++
+            - C
+      - Какой язык требует виртуальную машину?:
+          cost: 200
+          questions:
+          - Java
+          - Python
+          - Ruby
+          - Assembler
+    Информация о компьютере:
+      - Какая платформа не используется в компьютере?:
+          cost: 100
+          questions:
+          - Windows
+          - Linux
+          - MacOS
+          - Android
+      - Какая программа обеспечивает виртуальную машину?:
+          cost: 200
+          questions:
+          - VMware
+          - OpenStudio
+          - PhotoShop
+          - Virtual Computing
+      

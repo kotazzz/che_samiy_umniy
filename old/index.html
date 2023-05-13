@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Че, самый умный?</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+
+</head>
+
+<body>
+    <div class="container" id="main">
+        <div class="text-center bg-info text-light rounded-2 my-3 py-3">
+            <h1>Че, самый умный?</h1>
+            <p>Интеллектуальная игра, если стало скучно на паре</p>
+        </div>
+        <div class="row">
+            <div class="col-3">
+                <div class="row">
+                    <button class="btn btn-primary my-1" id="s0o1">Инструкции</button>
+                    <button class="btn btn-primary my-1" id="s0o2">Информация</button>
+                    <button class="btn btn-primary my-1">???</button>
+                </div>
+            </div>
+            <div class="col-9">
+                <!------------------------------------------------------>
+                <!--                 Screen 1                         -->
+                <!------------------------------------------------------>
+                <div id="screen1" style="display:none">
+                    <h1 class="text-center">Добро пожаловать! Сейчас игра должна проверить соединение с сервером</h1>
+                    <button class="btn btn-primary" id="s1o1">Проверить соединение</button>
+                    <button class="btn btn-primary" id="s1o3" disabled>Продолжить</button>
+                    <p id="s1o2">
+                        Соединение не проверено
+                    </p>
+                </div>
+                <!------------------------------------------------------>
+                <!--                 Screen 2                         -->
+                <!------------------------------------------------------>
+                <div id="screen2" style="display:none">
+                    <h1 class="text-center">Настройка команд</h1>
+                    <p>В этом окне вы можете настроить команды, после настройки нажмите "сохранить", сервер создаст
+                        новую сессию игры и обозначит команды</p>
+                    <!-- counter and 5 text areas-->
+                    <label id="s2o2" class="form-label">Количество команд: <span class="text-danger">установите
+                            значение!</span></label>
+                    <input type="range" class="form-range" min="2" max="5" id="s2o1">
+
+                    <div class="row" id="s2o4" style="display:none">
+                        <label class="form-label">Названия команд:</label>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">К1</span>
+                            <input type="text" class="form-control" placeholder="Команда 1" id="s2o31">
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">К2</span>
+                            <input type="text" class="form-control" placeholder="Команда 2" id="s2o32">
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">К3</span>
+                            <input type="text" class="form-control" placeholder="Команда 3" id="s2o33">
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">К4</span>
+                            <input type="text" class="form-control" placeholder="Команда 4" id="s2o34">
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">К5</span>
+                            <input type="text" class="form-control" placeholder="Команда 5" id="s2o35">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="s2o98" disabled>Сохранить</button>
+                    <button class="btn btn-primary" id="s2o99" disabled>Далее</button>
+                </div>
+                <!------------------------------------------------------>
+                <!--                 Screen 3                         -->
+                <!------------------------------------------------------>
+                <div id="screen3" style="display:none">
+                    <h1 class="text-center">Выберите пакет вопросов</h1>
+                    <!-- TEXTAREA -->
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="s3o1">Название файла с вопросами</span>
+                        <input type="text" class="form-control" placeholder="q.txt (по умолчанию)">
+                      </div>
+                      <button class="btn btn-primary" id="s3o2">Загрузить</button>
+                      <button class="btn btn-primary" id="s3o3" disabled>Далее</button>
+                </div>
+            </div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
+            crossorigin="anonymous"></script>
+        <!-- JQuerry -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+        <script>
+            /*****************************************/
+            /*               Базовая зона            */
+            /*****************************************/
+            logs = []
+
+            function log(msg) {
+                console.log(msg);
+                logs.push(msg);
+                // hold only 100 messages
+                if (logs.length > 100) {
+                    logs.shift();
+                }
+            }
+            api = 'http://localhost:8000'
+            function req(path, data) {
+                return $.ajax({
+                    url: api + path,
+                    type: 'GET',
+                    data: JSON.stringify(data),
+                    contentType: 'application/json',
+                    dataType: 'json',
+                });
+            }
+            screen = 0
+            function show_screen(id) {
+                if (screen != 0) {
+                    $('#screen' + screen).hide()
+                }
+                $('#screen' + id).show()
+                screen = id
+            }
+            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            show_screen(3)
+            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            function bcast(msg) {
+                $('#main').html(`<div class="alert alert-warning alert-dismissible fade show my-3" role="alert">
+            ${msg}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>` + $('#main').html()
+                )
+            }
+            /*****************************************/
+            /*               Screen 0                */
+            /*****************************************/
+            $('#s0o1').click(function () {
+                bcast(
+                    `
+                <h1>Инструкции</h1>
+                <ul>
+                    <li>Проверьте соединение с сервером</li>
+                    <li>2</li>
+                    <li>3</li>
+                </ul>
+                `
+                )
+            })
+            $('#s0o2').click(function () {
+                req('/info', {}).done(function (data) {
+                    bcast(`
+                    <h1>Информация</h1>
+                    Пока сюда ничего не выводится, потому что кому то лень оформить. Вот сырой ответ: ${JSON.stringify(data)}
+                    `)
+                })
+            })
+            /*****************************************/
+            /*               Screen 1                */
+            /*****************************************/
+            $("#s1o1").click(function () {
+                req("/ping", {}).done(function (data) {
+                    $("#s1o2").html(`Соединение есть! Версия сервера: <code>${data.version}</code>`);
+                    $("#s1o3").removeAttr("disabled");
+                });
+            });
+            $("#s1o3").click(function () {
+                show_screen(2);
+            });
+            /*****************************************/
+            /*               Screen 2                */
+            /*****************************************/
+            command_names = [
+                $('#s2o31'),
+                $('#s2o32'),
+                $('#s2o33'),
+                $('#s2o34'),
+                $('#s2o35'),
+            ]
+            $("#s2o1").change(function () {
+                $("#s2o98").removeAttr("disabled");
+                $("#s2o4").show();
+                $("#s2o2").text(`Количество команд: ${this.value}`);
+                for (let i = 0; i < 5; i++) {
+                    if (i < this.value) {
+                        command_names[i].parent().show();
+                    } else {
+                        command_names[i].parent().hide();
+                    }
+                }
+            });
+            $("#s2o98").click(function () {
+                req("/set", {
+                    "command_count": parseInt($("#s2o1").val()),
+                    "command_names": [
+                        $('#s2o31').val(),
+                        $('#s2o32').val(),
+                        $('#s2o33').val(),
+                        $('#s2o34').val(),
+                        $('#s2o35').val(),
+                    ]
+                }).done(function (data) {
+                    bcast(`Команды сохранены!`);
+                    $("#s2o99").removeAttr("disabled");
+                });
+            });
+            $("#s2o99").click(function () {
+                show_screen(3);
+            });
+            /*****************************************/
+            /*               Screen 2                */
+            /*****************************************/
+            $("#s3o2").click(function () {
+                response = {
+                    'filename': $('#s3o1').val(),
+                }
+                req("/questions", response).done(function (data) {
+                    bcast(`Вопросы загружены!`);
+                    $("#s3o3").removeAttr("disabled");
+                });
+            });
+        </script>
+</body>
+
+</html>
